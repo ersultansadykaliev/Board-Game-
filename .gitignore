@@ -23,6 +23,8 @@ Thumbs.db
 simulate_games.py
 simulate_concurrent.py
 crash_test.py
+fuzz_games.py
+.env
 chaos_network_test.py
 race_condition_test.py
 run_tests.py

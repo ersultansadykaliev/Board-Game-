@@ -4,11 +4,17 @@
 
 import os
 
-# ─── Telegram Bot Token ─────────────────────────────────────────
-# Замените на свой токен от @BotFather или задайте переменную окружения
-BOT_TOKEN = os.getenv(
-    "UGOLKI_BOT_TOKEN", "8674528754:AAHNsr1QNva_dJtvw9iQ9-nyGx90GasmVWY"
-)
+# Загружаем переменные из .env файла (если он есть)
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass
+
+BOT_TOKEN = os.getenv("UGOLKI_BOT_TOKEN", "")
+
+if not BOT_TOKEN:
+    print("ВНИМАНИЕ: Токен бота не найден! Убедитесь, что переменная UGOLKI_BOT_TOKEN задана.")
 
 # ─── Настройки игры ─────────────────────────────────────────────
 BOARD_SIZE = 8
