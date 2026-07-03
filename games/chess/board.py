@@ -649,8 +649,8 @@ class Board:
             
         keyboard = []
 
-        rows = range(self.SIZE) if not flip_board else reversed(range(self.SIZE))
-        cols = range(self.SIZE) if not flip_board else reversed(range(self.SIZE))
+        rows = list(range(self.SIZE)) if not flip_board else list(reversed(range(self.SIZE)))
+        cols = list(range(self.SIZE)) if not flip_board else list(reversed(range(self.SIZE)))
 
         for r in rows:
             row_buttons = []

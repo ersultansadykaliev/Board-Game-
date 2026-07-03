@@ -815,11 +815,20 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -
     # ─── Game controls ───────────────────────────────────────────
     if data == "surrender":
         user = query.from_user
-        game = manager.get_game_by_user(user.id)
-        if game is None:
-            game = checkers_manager.get_game_by_user(user.id)
-        if game is None:
-            game = chess_manager.get_game_by_user(user.id)
+        game = None
+        if query.inline_message_id:
+            if query.inline_message_id in checkers_manager.games:
+                game = checkers_manager.get_inline_game(query.inline_message_id)
+            elif query.inline_message_id in manager.games:
+                game = manager.get_inline_game(query.inline_message_id)
+            elif query.inline_message_id in chess_manager.games:
+                game = chess_manager.get_inline_game(query.inline_message_id)
+        else:
+            game = manager.get_game_by_user(user.id)
+            if game is None:
+                game = checkers_manager.get_game_by_user(user.id)
+            if game is None:
+                game = chess_manager.get_game_by_user(user.id)
 
         if game and game.state.name == "PLAYING" and game.is_participant(user.id):
             game.surrender(user.id)
@@ -832,11 +841,20 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -
 
     if data == "draw":
         user = query.from_user
-        game = manager.get_game_by_user(user.id)
-        if game is None:
-            game = checkers_manager.get_game_by_user(user.id)
-        if game is None:
-            game = chess_manager.get_game_by_user(user.id)
+        game = None
+        if query.inline_message_id:
+            if query.inline_message_id in checkers_manager.games:
+                game = checkers_manager.get_inline_game(query.inline_message_id)
+            elif query.inline_message_id in manager.games:
+                game = manager.get_inline_game(query.inline_message_id)
+            elif query.inline_message_id in chess_manager.games:
+                game = chess_manager.get_inline_game(query.inline_message_id)
+        else:
+            game = manager.get_game_by_user(user.id)
+            if game is None:
+                game = checkers_manager.get_game_by_user(user.id)
+            if game is None:
+                game = chess_manager.get_game_by_user(user.id)
 
         if game and game.state.name == "PLAYING" and game.is_participant(user.id):
             if game.mode.value == "pve":
@@ -1122,6 +1140,9 @@ async def _handle_cell_click(query, context: ContextTypes.DEFAULT_TYPE) -> None:
         if query.inline_message_id in checkers_manager.games:
             game = checkers_manager.get_inline_game(query.inline_message_id)
             is_checkers = True
+        elif query.inline_message_id in chess_manager.games:
+            game = chess_manager.get_inline_game(query.inline_message_id)
+            is_checkers = False
         else:
             game = manager.get_inline_game(query.inline_message_id)
 
