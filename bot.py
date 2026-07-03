@@ -187,7 +187,7 @@ async def cmd_start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
     keyboard = InlineKeyboardMarkup(
         [
-            [InlineKeyboardButton("🚀 Открыть Mini App", web_app=WebAppInfo(url="https://yourusername.pythonanywhere.com/"))],
+            [InlineKeyboardButton("🚀 Открыть Mini App", web_app=WebAppInfo(url="https://Ersultan000.pythonanywhere.com/"))],
             [InlineKeyboardButton("🎮 Классические Игры (Текст)", callback_data="show_games_menu")],
             [InlineKeyboardButton("📜 Правила", callback_data="rules_dummy")],
         ]

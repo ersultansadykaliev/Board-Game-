@@ -250,14 +250,13 @@ async function handleCellClick(r, c) {
             renderBoard();
             updateTurnStatus();
             
-            if (data.ai_result) {
-                tg.HapticFeedback.impactOccurred('medium');
-            }
-            
             if (data.game_over) {
                 if (pollInterval) clearInterval(pollInterval);
                 setStatus(`Игра окончена! ${data.reason}`);
                 tg.HapticFeedback.notificationOccurred('success');
+            } else if (gameMode === 'PVE' && !isMyTurn) {
+                // Если сейчас ход ИИ, запрашиваем его ход с задержкой для анимации
+                setTimeout(makeAiMove, 600);
             }
         } else {
             tg.HapticFeedback.notificationOccurred('error');
@@ -265,6 +264,38 @@ async function handleCellClick(r, c) {
         }
     } catch (e) {
         setStatus("Ошибка сети");
+    } finally {
+        isWaitingForServer = false;
+    }
+}
+
+async function makeAiMove() {
+    isWaitingForServer = true;
+    try {
+        const response = await fetch('/api/ai_move', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ game_id: currentGameId })
+        });
+        const data = await response.json();
+        
+        if (data.status === 'ok') {
+            boardState = data.board.grid;
+            currentTurn = data.board.turn;
+            
+            tg.HapticFeedback.impactOccurred('medium');
+            
+            renderBoard();
+            updateTurnStatus();
+            
+            if (data.game_over) {
+                if (pollInterval) clearInterval(pollInterval);
+                setStatus(`Игра окончена! ${data.reason}`);
+                tg.HapticFeedback.notificationOccurred('success');
+            }
+        }
+    } catch (e) {
+        console.error("Ошибка при ходе ИИ", e);
     } finally {
         isWaitingForServer = false;
     }

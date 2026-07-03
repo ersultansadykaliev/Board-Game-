@@ -161,13 +161,6 @@ def click():
     # Обрабатываем клик пользователя
     result = game.handle_click(user_id, r, c)
     
-    # Если это PvE, запускаем ход ИИ
-    ai_result = None
-    if game.mode.name == "PVE" and game.state.name != "FINISHED":
-        ai_turn_value = -1 if "chess" in game.__module__ else 2
-        if game.current_turn == ai_turn_value:
-            ai_result = game.make_ai_move()
-
     # Проверяем, завершилась ли игра
     game_over = game.state.name == "FINISHED"
     reason = game.finish_reason if game_over else ""
@@ -181,10 +174,44 @@ def click():
     return jsonify({
         "status": "ok",
         "result": result,
-        "ai_result": ai_result,
         "board": _serialize_board(game),
         "selected_piece": game.selected_piece,
         "valid_moves": game.valid_moves,
+        "game_over": game_over,
+        "reason": reason
+    })
+
+@app.route("/api/ai_move", methods=["POST"])
+def ai_move():
+    data = request.json
+    game_id = data.get("game_id")
+    
+    game = load_game(game_id)
+    if not game:
+        return jsonify({"status": "error", "message": "Игра не найдена"}), 404
+        
+    if game.state.name == "FINISHED" or game.mode.name != "PVE":
+        return jsonify({"status": "error"}), 400
+
+    ai_turn_value = -1 if "chess" in game.__module__ else 2
+    if game.current_turn != ai_turn_value:
+        return jsonify({"status": "error", "message": "Не ход ИИ"}), 400
+
+    ai_result = game.make_ai_move()
+    
+    game_over = game.state.name == "FINISHED"
+    reason = game.finish_reason if game_over else ""
+    if game_over and game.winner == 0:
+        reason = f"Ничья ({reason})"
+    elif game_over:
+        reason = f"Победитель: {'Белые' if game.winner == 1 else 'Черные'} ({reason})"
+
+    save_game(game)
+
+    return jsonify({
+        "status": "ok",
+        "result": ai_result,
+        "board": _serialize_board(game),
         "game_over": game_over,
         "reason": reason
     })
