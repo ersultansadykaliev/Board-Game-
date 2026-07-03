@@ -116,9 +116,8 @@ async function initGame(gameType = 'chess', mode = 'PVE') {
 
 function showInviteScreen(gameId) {
     document.getElementById('waiting-screen').style.display = 'block';
-    // В Telegram ботах startapp параметр должен состоять только из [a-zA-Z0-9_-]
-    const botUsername = "BoardGameUgolkiBot"; // Замените на реальное имя вашего бота, если нужно
-    const link = `https://t.me/${botUsername}/app?startapp=${gameId}`;
+    // Используем прямую ссылку на сайт, чтобы работало у всех без настройки t.me
+    const link = `https://Ersultan000.pythonanywhere.com/?start_param=pvp_${gameId}`;
     document.getElementById('invite-link').innerText = link;
 }
 
