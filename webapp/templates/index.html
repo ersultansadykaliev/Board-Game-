@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Chess Mini App</title>
+    <!-- Подключаем Telegram Web App JS -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div id="app-container">
+        <main>
+            <div id="game-menu" class="menu-container">
+                <div class="menu-header">
+                    <h1>Настольные Игры</h1>
+                    <p>Выберите игру и режим</p>
+                </div>
+                
+                <div class="game-card">
+                    <h3 class="game-title"><span class="game-icon">♟&#xFE0E;</span> Шахматы</h3>
+                    <div class="game-actions">
+                        <button class="btn-ai" onclick="initGame('chess', 'PVE')">🤖 С ботом</button>
+                        <button class="btn-friend" onclick="initGame('chess', 'PVP')">👤 С другом</button>
+                    </div>
+                </div>
+                
+                <div class="game-card">
+                    <h3 class="game-title"><span class="game-icon">⚪</span> Шашки</h3>
+                    <div class="game-actions">
+                        <button class="btn-ai" onclick="initGame('checkers', 'PVE')">🤖 С ботом</button>
+                        <button class="btn-friend" onclick="initGame('checkers', 'PVP')">👤 С другом</button>
+                    </div>
+                </div>
+                
+                <div class="game-card">
+                    <h3 class="game-title"><span class="game-icon">⚫</span> Уголки</h3>
+                    <div class="game-actions">
+                        <button class="btn-ai" onclick="initGame('ugolki', 'PVE')">🤖 С ботом</button>
+                        <button class="btn-friend" onclick="initGame('ugolki', 'PVP')">👤 С другом</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="waiting-screen" class="game-card" style="display: none; text-align: center; margin: 20px 10px;">
+                <div class="spinner"></div>
+                <h2 class="game-title" style="justify-content: center;">Ожидание друга...</h2>
+                <p style="opacity: 0.8; margin-bottom: 20px; color: #fff;">Отправьте эту ссылку другу, чтобы он присоединился к игре:</p>
+                <div class="invite-box" id="invite-link"></div>
+                <button class="btn-friend" style="width: 100%; margin-top: 20px;" onclick="copyInviteLink()">📋 Скопировать ссылку</button>
+            </div>
+            
+            <div id="game-area" style="display: none; width: 100%; flex-direction: column; height: 100%;">
+                <header id="opponent-header">
+                    <div class="player-info bot-info">
+                        <span class="avatar" id="opponent-avatar">🤖</span>
+                        <span class="name" id="opponent-name">Бот ИИ</span>
+                    </div>
+                </header>
+                
+                <div id="board-container" style="flex: 1; display: flex; align-items: center;">
+                    <div id="board"></div>
+                </div>
+                <div id="status-message">Ожидание...</div>
+                
+                <footer>
+                    <div class="player-info user-info">
+                        <span class="avatar">👤</span>
+                        <span class="name" id="user-name">Игрок</span>
+                    </div>
+                </footer>
+            </div>
+        </main>
+    </div>
+    <script src="/static/app.js"></script>
+</body>
+</html>

@@ -9,7 +9,7 @@ from __future__ import annotations
 import asyncio
 import logging
 
-from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, Bot, BotCommand
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, Bot, BotCommand, WebAppInfo
 from telegram.ext import (
     Application,
     ApplicationBuilder,
@@ -187,7 +187,8 @@ async def cmd_start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
     keyboard = InlineKeyboardMarkup(
         [
-            [InlineKeyboardButton("🎮 Игры", callback_data="show_games_menu")],
+            [InlineKeyboardButton("🚀 Открыть Mini App", web_app=WebAppInfo(url="https://yourusername.pythonanywhere.com/"))],
+            [InlineKeyboardButton("🎮 Классические Игры (Текст)", callback_data="show_games_menu")],
             [InlineKeyboardButton("📜 Правила", callback_data="rules_dummy")],
         ]
     )

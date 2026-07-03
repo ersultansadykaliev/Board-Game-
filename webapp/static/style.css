@@ -1,0 +1,302 @@
+:root {
+    --bg-color: #0f172a;
+    --board-bg: rgba(255, 255, 255, 0.05);
+    --cell-light: #cbd5e1;
+    --cell-dark: #475569;
+    --cell-highlight: rgba(56, 189, 248, 0.5);
+    --cell-selected: rgba(16, 185, 129, 0.6);
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+    --accent-color: #38bdf8;
+}
+
+/* Telegram Web App Variables Override */
+body.tg-theme-dark {
+    --bg-color: var(--tg-theme-bg-color, #0f172a);
+    --text-primary: var(--tg-theme-text-color, #f8fafc);
+    --text-secondary: var(--tg-theme-hint-color, #94a3b8);
+    --accent-color: var(--tg-theme-button-color, #38bdf8);
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-primary);
+    overflow: hidden; /* Предотвращаем скролл в WebApp */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+#app-container {
+    width: 100%;
+    max-width: 500px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+header, footer {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 16px;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    margin: 10px 0;
+}
+
+.player-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.avatar {
+    font-size: 24px;
+    background: rgba(255, 255, 255, 0.1);
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+}
+
+.name {
+    font-weight: 600;
+    font-size: 16px;
+}
+
+main {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+#board-container {
+    width: 100%;
+    aspect-ratio: 1;
+    background: var(--board-bg);
+    border-radius: 12px;
+    padding: 8px;
+    box-sizing: border-box;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+#board {
+    width: 100%;
+    height: 100%;
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    grid-template-rows: repeat(8, 1fr);
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+}
+
+.cell {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: clamp(24px, 8vw, 40px); /* Адаптивный размер фигур */
+    cursor: pointer;
+    user-select: none;
+    transition: background-color 0.2s, transform 0.1s;
+    position: relative;
+}
+
+.cell.light { background-color: var(--cell-light); }
+.cell.dark { background-color: var(--cell-dark); }
+
+.cell.selected {
+    background-color: var(--cell-selected) !important;
+}
+
+.cell.highlight {
+    background-color: var(--cell-highlight) !important;
+}
+.cell.highlight::after {
+    content: '';
+    position: absolute;
+    width: 30%;
+    height: 30%;
+    background-color: rgba(0, 0, 0, 0.3);
+    border-radius: 50%;
+}
+
+.piece {
+    transition: transform 0.2s ease-in-out;
+}
+
+.piece[data-color="WHITE"] {
+    color: #ffffff;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+}
+
+.piece[data-color="BLACK"] {
+    color: #000000;
+    text-shadow: 0 2px 4px rgba(255,255,255,0.5);
+}
+
+#status-message {
+    margin-top: 20px;
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--accent-color);
+    text-align: center;
+    min-height: 24px;
+    transition: all 0.3s;
+}
+
+/* Animations */
+@keyframes pieceMove {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+
+.moving {
+    animation: pieceMove 0.3s ease-in-out;
+}
+
+.menu-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 100%;
+    padding: 10px;
+}
+
+.menu-header {
+    text-align: center;
+    margin-bottom: 10px;
+    color: var(--tg-theme-text-color, #fff);
+}
+
+.menu-header h1 {
+    font-size: 28px;
+    margin: 0 0 5px 0;
+    background: linear-gradient(135deg, #00c6ff, #0072ff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.menu-header p {
+    margin: 0;
+    opacity: 0.7;
+    font-size: 14px;
+}
+
+.game-card {
+    background: rgba(30, 41, 59, 0.7);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.game-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(0, 198, 255, 0.2);
+    border-color: rgba(0, 198, 255, 0.3);
+}
+
+.game-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 22px;
+    color: #f8fafc;
+}
+
+.game-icon {
+    font-size: 28px;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+}
+
+.game-actions {
+    display: flex;
+    gap: 12px;
+}
+
+.btn-ai, .btn-friend {
+    flex: 1;
+    border: none;
+    padding: 14px 10px;
+    font-size: 15px;
+    font-weight: 600;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.btn-ai {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.btn-ai:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.btn-friend {
+    background: linear-gradient(135deg, #00c6ff, #0072ff);
+    color: #fff;
+    box-shadow: 0 4px 15px rgba(0, 114, 255, 0.4);
+}
+
+.btn-friend:hover {
+    box-shadow: 0 6px 20px rgba(0, 114, 255, 0.6);
+    transform: scale(1.02);
+}
+
+.btn-ai:active, .btn-friend:active {
+    transform: scale(0.95);
+}
+
+.spinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid rgba(255, 255, 255, 0.1);
+    border-top-color: #00c6ff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 20px auto;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.invite-box {
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px dashed rgba(255, 255, 255, 0.2);
+    padding: 15px;
+    border-radius: 12px;
+    font-family: monospace;
+    word-break: break-all;
+    color: #00c6ff;
+    font-size: 14px;
+}

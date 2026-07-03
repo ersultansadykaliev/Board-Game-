@@ -31,3 +31,6 @@ run_tests.py
 
 # Environment
 .env
+
+# Database
+games.db
