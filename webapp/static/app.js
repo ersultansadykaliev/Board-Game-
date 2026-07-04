@@ -116,8 +116,8 @@ async function initGame(gameType = 'chess', mode = 'PVE') {
 
 function showInviteScreen(gameId) {
     document.getElementById('waiting-screen').style.display = 'block';
-    // gameId уже имеет вид pvp_xxxxx, поэтому не добавляем pvp_ повторно
-    const link = `https://Ersultan000.pythonanywhere.com/?start_param=${gameId}`;
+    // Используем deep link через бота — так Mini App откроется ВНУТРИ Telegram
+    const link = `https://t.me/Boardgames_1bot?start=${gameId}`;
     document.getElementById('invite-link').innerText = link;
 }
 

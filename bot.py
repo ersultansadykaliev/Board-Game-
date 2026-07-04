@@ -166,12 +166,28 @@ async def cmd_start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     user = update.effective_user
     user_name = user.first_name or user.username or f"Player {user.id}"
 
-    # Check for deep link: /start join_GAMEID
+    # Check for deep link: /start join_GAMEID or /start pvp_GAMEID
     if context.args and len(context.args) > 0:
         arg = context.args[0]
         if arg.startswith("join_"):
             game_id = arg[5:]
             await _handle_join_via_link(update, user, user_name, game_id)
+            return
+        elif arg.startswith("pvp_"):
+            # Мультиплеер через Mini App — отправляем кнопку для открытия игры
+            game_id = arg  # полный ID вида pvp_xxxxx
+            join_url = f"https://Ersultan000.pythonanywhere.com/?start_param={game_id}"
+            keyboard = InlineKeyboardMarkup([
+                [InlineKeyboardButton(
+                    "🎮 Присоединиться к игре!",
+                    web_app=WebAppInfo(url=join_url)
+                )]
+            ])
+            await update.message.reply_text(
+                f"🎲 Вас пригласили сыграть в настольную игру!\n\n"
+                f"Нажмите кнопку ниже, чтобы присоединиться:",
+                reply_markup=keyboard
+            )
             return
 
     welcome_text = (
