@@ -6,7 +6,7 @@
     <title>Chess Mini App</title>
     <!-- Подключаем Telegram Web App JS -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link rel="stylesheet" href="/static/style.css?v=3">
+    <link rel="stylesheet" href="/static/style.css?v=4">
 </head>
 <body>
     <div id="app-container">
@@ -73,7 +73,7 @@
                 <button class="btn-ai" style="width: 100%; margin-top: 10px; background: rgba(51, 144, 236, 0.2); border: 1px solid #3390ec;" onclick="shareInviteLink()">✈️ Выбрать друга в Telegram</button>
             </div>
             
-            <div id="game-area" style="display: none; width: 100%; flex-direction: column; height: 100%;">
+            <div id="game-area" style="display: none; width: 100%; flex-direction: column; min-height: 100%;">
                 <header id="opponent-header">
                     <div class="player-info bot-info">
                         <span class="avatar" id="opponent-avatar">🤖</span>
@@ -101,6 +101,6 @@
             </div>
         </main>
     </div>
-    <script src="/static/app.js?v=3"></script>
+    <script src="/static/app.js?v=4"></script>
 </body>
 </html>
