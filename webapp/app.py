@@ -36,9 +36,81 @@ def load_game(game_id):
             return pickle.loads(row[0])
     return None
 
+def _detect_game_type(game):
+    """Определяет тип игры по модулю."""
+    module = game.__module__
+    if "chess" in module:
+        return "chess"
+    elif "checkers" in module:
+        return "checkers"
+    elif "ugolki" in module:
+        return "ugolki"
+    return "unknown"
+
 @app.route("/")
 def index():
     return render_template("index.html")
+
+@app.route("/api/my_games", methods=["GET"])
+def my_games():
+    """Найти активные (незавершённые) игры пользователя."""
+    user_id = request.args.get("user_id")
+    if not user_id:
+        return jsonify({"status": "ok", "games": []})
+    
+    try:
+        user_id_int = int(user_id)
+    except (ValueError, TypeError):
+        user_id_int = None
+    
+    active_games = []
+    with sqlite3.connect(DB_PATH) as conn:
+        cur = conn.execute("SELECT game_id, data FROM games")
+        for row in cur.fetchall():
+            try:
+                game = pickle.loads(row[1])
+                if game.state.name in ("PLAYING", "WAITING"):
+                    p1 = getattr(game, 'player1_id', None)
+                    p2 = getattr(game, 'player2_id', None)
+                    if str(p1) == str(user_id) or p1 == user_id_int or str(p2) == str(user_id) or p2 == user_id_int:
+                        game_type = _detect_game_type(game)
+                        is_pvp = game.mode.name == "PVP"
+                        opponent = ""
+                        if is_pvp:
+                            if str(p1) == str(user_id) or p1 == user_id_int:
+                                opponent = getattr(game, 'player2_name', 'Оппонент') or 'Ожидание...'
+                            else:
+                                opponent = getattr(game, 'player1_name', 'Оппонент')
+                        else:
+                            opponent = "Бот ИИ"
+                        
+                        my_color = "WHITE"
+                        if is_pvp and (str(p2) == str(user_id) or p2 == user_id_int):
+                            my_color = "BLACK"
+                        
+                        active_games.append({
+                            "game_id": game.game_id,
+                            "game_type": game_type,
+                            "mode": game.mode.name,
+                            "state": game.state.name,
+                            "opponent": opponent,
+                            "my_color": my_color,
+                            "board": _serialize_board(game)
+                        })
+            except Exception:
+                continue
+    
+    return jsonify({"status": "ok", "games": active_games})
+
+@app.route("/api/delete_game", methods=["POST"])
+def delete_game():
+    """Удалить игру из базы."""
+    data = request.json
+    game_id = data.get("game_id")
+    if game_id:
+        with sqlite3.connect(DB_PATH) as conn:
+            conn.execute("DELETE FROM games WHERE game_id = ?", (game_id,))
+    return jsonify({"status": "ok"})
 
 @app.route("/api/start_game", methods=["POST"])
 def start_game():
@@ -257,8 +329,8 @@ def _serialize_board(game):
                     elif piece == 3: color, type_name = "WHITE", "KING"
                     elif piece == 4: color, type_name = "BLACK", "KING"
                 elif "ugolki" in game_module:
-                    if piece == 1: color, type_name = "WHITE", "MAN"
-                    elif piece == 2: color, type_name = "BLACK", "MAN"
+                    if piece == 1: color, type_name = "WHITE", "UGOLKI_MAN"
+                    elif piece == 2: color, type_name = "BLACK", "UGOLKI_MAN"
                 
                 row.append({
                     "type": type_name,

@@ -14,7 +14,8 @@ document.getElementById('user-name').textContent = user_name;
 const PIECE_SYMBOLS = {
     'PAWN_WHITE': '♟\uFE0E', 'ROOK_WHITE': '♜\uFE0E', 'KNIGHT_WHITE': '♞\uFE0E', 'BISHOP_WHITE': '♝\uFE0E', 'QUEEN_WHITE': '♛\uFE0E', 'KING_WHITE': '♚\uFE0E',
     'PAWN_BLACK': '♟\uFE0E', 'ROOK_BLACK': '♜\uFE0E', 'KNIGHT_BLACK': '♞\uFE0E', 'BISHOP_BLACK': '♝\uFE0E', 'QUEEN_BLACK': '♛\uFE0E', 'KING_BLACK': '♚\uFE0E',
-    'MAN_WHITE': '⚪', 'KING_WHITE': '♔', 'MAN_BLACK': '⚫', 'KING_BLACK': '♚'
+    'MAN_WHITE': '⚪', 'KING_WHITE_CHECKERS': '♔', 'MAN_BLACK': '⚫', 'KING_BLACK_CHECKERS': '♚',
+    'UGOLKI_MAN_WHITE': '▲', 'UGOLKI_MAN_BLACK': '▼'
 };
 
 let boardState = null;
@@ -39,6 +40,9 @@ if (!startParam) {
 
 if (startParam && startParam.startsWith('pvp_')) {
     joinGame(startParam); // startParam уже содержит полный game_id вида pvp_xxxxx
+} else {
+    // Проверяем незавершённые игры при обычном запуске
+    checkActiveGames();
 }
 
 async function joinGame(gameId) {
@@ -74,6 +78,87 @@ async function joinGame(gameId) {
         }
     } catch (e) {
         alert("Ошибка сети");
+    }
+}
+
+async function checkActiveGames() {
+    try {
+        const response = await fetch(`/api/my_games?user_id=${user_id}`);
+        const data = await response.json();
+        if (data.status === 'ok' && data.games.length > 0) {
+            const game = data.games[0];
+            showResumeScreen(game);
+        }
+    } catch (e) {
+        console.error('Ошибка проверки активных игр', e);
+    }
+}
+
+function showResumeScreen(game) {
+    const gameNames = { chess: 'Шахматы', checkers: 'Шашки', ugolki: 'Уголки' };
+    const gameName = gameNames[game.game_type] || game.game_type;
+    const modeText = game.mode === 'PVP' ? `против ${game.opponent}` : 'против Бота ИИ';
+    
+    document.getElementById('resume-game-name').textContent = `${gameName} ${modeText}`;
+    document.getElementById('resume-screen').style.display = 'block';
+    document.getElementById('resume-screen').dataset.gameId = game.game_id;
+    document.getElementById('resume-screen').dataset.gameType = game.game_type;
+    document.getElementById('resume-screen').dataset.gameMode = game.mode;
+    document.getElementById('resume-screen').dataset.myColor = game.my_color;
+}
+
+async function resumeGame() {
+    const resumeEl = document.getElementById('resume-screen');
+    const gameId = resumeEl.dataset.gameId;
+    const gameType = resumeEl.dataset.gameType;
+    const mode = resumeEl.dataset.gameMode;
+    const color = resumeEl.dataset.myColor;
+    
+    resumeEl.style.display = 'none';
+    document.getElementById('game-menu').style.display = 'none';
+    
+    currentGameId = gameId;
+    currentGameType = gameType;
+    gameMode = mode;
+    myColor = color;
+    
+    try {
+        const response = await fetch(`/api/state?game_id=${gameId}`);
+        const data = await response.json();
+        if (data.status === 'ok') {
+            boardState = data.board.grid;
+            currentTurn = data.board.turn;
+            
+            const opponentName = data.opponent_name || 'Оппонент';
+            document.getElementById('opponent-name').textContent = mode === 'PVE' ? 'Бот ИИ' : opponentName;
+            document.getElementById('opponent-avatar').textContent = mode === 'PVE' ? '🤖' : '👤';
+            document.getElementById('game-area').style.display = 'flex';
+            
+            renderBoard();
+            updateTurnStatus();
+            
+            if (mode === 'PVP') {
+                startPolling();
+            }
+        }
+    } catch (e) {
+        alert('Ошибка загрузки игры');
+    }
+}
+
+async function dismissResume() {
+    const resumeEl = document.getElementById('resume-screen');
+    const gameId = resumeEl.dataset.gameId;
+    resumeEl.style.display = 'none';
+    
+    try {
+        await fetch('/api/delete_game', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ game_id: gameId })
+        });
+    } catch (e) {
+        console.error(e);
     }
 }
 

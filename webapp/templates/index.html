@@ -42,6 +42,15 @@
                 </div>
             </div>
             
+            <div id="resume-screen" class="game-card" style="display: none; text-align: center; margin: 20px 10px;">
+                <h2 class="game-title" style="justify-content: center;">🔄 Незавершённая игра</h2>
+                <p style="opacity: 0.9; margin-bottom: 15px; color: #fff; font-size: 16px;" id="resume-game-name">Шахматы против Бота ИИ</p>
+                <p style="opacity: 0.7; margin-bottom: 20px; color: #fff;">Хотите продолжить?</p>
+                <div class="game-actions" style="flex-direction: column; gap: 10px;">
+                    <button class="btn-ai" style="width: 100%; padding: 14px; font-size: 16px;" onclick="resumeGame()">▶️ Продолжить игру</button>
+                    <button class="btn-friend" style="width: 100%; padding: 14px; font-size: 16px; background: rgba(255,82,82,0.2); border: 1px solid #ff5252;" onclick="dismissResume()">🗑 Начать заново</button>
+                </div>
+            </div>
             <div id="waiting-screen" class="game-card" style="display: none; text-align: center; margin: 20px 10px;">
                 <div class="spinner"></div>
                 <h2 class="game-title" style="justify-content: center;">Ожидание друга...</h2>
