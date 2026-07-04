@@ -36,6 +36,12 @@ def load_game(game_id):
             return pickle.loads(row[0])
     return None
 
+def _normalize_user_id(user_id):
+    try:
+        return int(user_id)
+    except (ValueError, TypeError):
+        return user_id
+
 def _detect_game_type(game):
     """Определяет тип игры по модулю."""
     module = game.__module__
@@ -117,7 +123,7 @@ def delete_game():
 @app.route("/api/start_game", methods=["POST"])
 def start_game():
     data = request.json
-    user_id = data.get("user_id", "guest")
+    user_id = _normalize_user_id(data.get("user_id", "guest"))
     user_name = data.get("user_name", "Игрок")
     game_type = data.get("game_type", "chess")
     variant = data.get("variant", "classic")
@@ -144,7 +150,7 @@ def start_game():
 @app.route("/api/create_pvp", methods=["POST"])
 def create_pvp():
     data = request.json
-    user_id = data.get("user_id", "guest")
+    user_id = _normalize_user_id(data.get("user_id", "guest"))
     user_name = data.get("user_name", "Игрок")
     game_type = data.get("game_type", "chess")
     variant = data.get("variant", "classic")
@@ -174,7 +180,7 @@ def create_pvp():
 @app.route("/api/join_pvp", methods=["POST"])
 def join_pvp():
     data = request.json
-    user_id = data.get("user_id", "guest")
+    user_id = _normalize_user_id(data.get("user_id", "guest"))
     user_name = data.get("user_name", "Игрок")
     game_id = data.get("game_id")
     
@@ -262,7 +268,7 @@ def get_state():
 @app.route("/api/click", methods=["POST"])
 def click():
     data = request.json
-    user_id = data.get("user_id", "guest")
+    user_id = _normalize_user_id(data.get("user_id", "guest"))
     game_id = data.get("game_id")
     r = data.get("r")
     c = data.get("c")
@@ -338,7 +344,7 @@ def ai_move():
 @app.route("/api/surrender", methods=["POST"])
 def surrender_api():
     data = request.json
-    user_id = data.get("user_id", "guest")
+    user_id = _normalize_user_id(data.get("user_id", "guest"))
     game_id = data.get("game_id")
     
     game = load_game(game_id)
