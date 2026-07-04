@@ -99,11 +99,13 @@ async function checkActiveGames() {
         const response = await fetch(`/api/my_games?user_id=${user_id}`);
         const data = await response.json();
         
-        const section = document.getElementById('my-games-section');
+        const btnShow = document.getElementById('btn-show-my-games');
+        const listContainer = document.getElementById('my-games-list');
         
         if (data.status === 'ok' && data.games.length > 0) {
-            section.style.display = 'block';
-            section.innerHTML = '<h2 class="game-title" style="justify-content: center; margin-bottom: 15px;">🎮 Мои активные игры</h2>';
+            btnShow.style.display = 'block';
+            document.getElementById('active-games-count').textContent = data.games.length;
+            listContainer.innerHTML = '';
             
             const gameNames = { chess: 'Шахматы', checkers: 'Шашки', ugolki: 'Уголки' };
             
@@ -127,19 +129,40 @@ async function checkActiveGames() {
                         <button class="btn-friend" style="padding: 10px; font-size: 14px; background: rgba(255,82,82,0.2); border: 1px solid #ff5252;" onclick="dismissResume('${game.game_id}')">🗑</button>
                     </div>
                 `;
-                section.appendChild(card);
+                listContainer.appendChild(card);
             });
         } else {
-            section.style.display = 'none';
-            section.innerHTML = '';
+            btnShow.style.display = 'none';
+            listContainer.innerHTML = '';
+            hideMyGamesScreen();
         }
     } catch (e) {
         console.error('Ошибка проверки активных игр', e);
     }
 }
 
+function showMyGamesScreen() {
+    document.getElementById('game-menu').style.display = 'none';
+    document.getElementById('my-games-screen').style.display = 'flex';
+}
+
+function hideMyGamesScreen() {
+    const screen = document.getElementById('my-games-screen');
+    if (screen) {
+        screen.style.display = 'none';
+    }
+    const menu = document.getElementById('game-menu');
+    if (menu) {
+        menu.style.display = 'flex';
+    }
+}
+
 async function resumeGame(gameId, gameType, mode, color) {
     document.getElementById('game-menu').style.display = 'none';
+    const screen = document.getElementById('my-games-screen');
+    if (screen) {
+        screen.style.display = 'none';
+    }
     
     currentGameId = gameId;
     currentGameType = gameType;

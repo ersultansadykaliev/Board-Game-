@@ -17,9 +17,7 @@
                     <p>Выберите игру и режим</p>
                 </div>
                 
-                <div id="my-games-section" style="display: none; margin-bottom: 20px;">
-                    <!-- Здесь будут генерироваться карточки активных игр -->
-                </div>
+                <button id="btn-show-my-games" class="btn-friend" style="display: none; margin-bottom: 20px; width: 100%; padding: 12px; font-size: 16px; background: rgba(56, 189, 248, 0.2); border: 1px solid #38bdf8;" onclick="showMyGamesScreen()">🎮 Мои активные игры (<span id="active-games-count">0</span>)</button>
                 
                 <div class="game-card">
                     <h3 class="game-title"><span class="game-icon">♟&#xFE0E;</span> Шахматы</h3>
@@ -52,6 +50,17 @@
                         <button class="btn-friend" onclick="initGame('ugolki', 'PVP', document.getElementById('ugolki-variant').value)">👤 С другом</button>
                     </div>
                 </div>
+            </div>
+            
+            <div id="my-games-screen" class="menu-container" style="display: none;">
+                <div class="menu-header">
+                    <h1>Активные Игры</h1>
+                    <p>Продолжите незавершенную партию</p>
+                </div>
+                <div id="my-games-list" style="width: 100%;">
+                    <!-- Здесь будут генерироваться карточки активных игр -->
+                </div>
+                <button class="btn-ai" style="width: 100%; margin-top: 15px;" onclick="hideMyGamesScreen()">🔙 Назад в меню</button>
             </div>
             
 
