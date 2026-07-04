@@ -85,16 +85,17 @@ main {
 }
 
 #board-container {
-    width: 100%;
+    width: calc(100% - 0px);
     max-width: 100%;
     aspect-ratio: 1;
     background: var(--board-bg);
     border-radius: 12px;
-    padding: 8px;
+    padding: 6px;
     box-sizing: border-box;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
     backdrop-filter: blur(8px);
     border: 1px solid rgba(255, 255, 255, 0.1);
+    container-type: inline-size;
 }
 
 #board {
@@ -112,11 +113,12 @@ main {
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: clamp(24px, 8vw, 40px); /* Адаптивный размер фигур */
+    font-size: 11cqi; /* 100cqi = ширина board-container, делим на 8 ячеек + запас */
     cursor: pointer;
     user-select: none;
     transition: background-color 0.2s, transform 0.1s;
     position: relative;
+    overflow: hidden;
 }
 
 .cell.light { background-color: var(--cell-light); }
