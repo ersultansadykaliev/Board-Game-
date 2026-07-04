@@ -179,26 +179,51 @@ def join_pvp():
     if not game:
         return jsonify({"status": "error", "message": "Игра не найдена"}), 404
         
+    try:
+        user_id_int = int(user_id)
+    except (ValueError, TypeError):
+        user_id_int = None
+
+    # Если это создатель игры, он просто подключается обратно
+    if str(user_id) == str(game.player1_id) or user_id_int == game.player1_id:
+        opponent_name = getattr(game, 'player2_name', 'Оппонент') or 'Ожидание...'
+        return jsonify({
+            "status": "ok",
+            "state": game.state.name,
+            "game_type": _detect_game_type(game),
+            "board": _serialize_board(game),
+            "my_color": "WHITE",
+            "opponent_name": opponent_name
+        })
+
     if game.state.name != "WAITING":
-        if user_id in (game.player1_id, game.player2_id):
+        if str(user_id) == str(game.player2_id) or user_id_int == game.player2_id:
+            opponent_name = getattr(game, 'player1_name', 'Оппонент')
             return jsonify({
                 "status": "ok",
-                "game_type": "chess" if "chess" in game.__module__ else ("checkers" if "checkers" in game.__module__ else "ugolki"),
-                "board": _serialize_board(game)
+                "state": game.state.name,
+                "game_type": _detect_game_type(game),
+                "board": _serialize_board(game),
+                "my_color": "BLACK",
+                "opponent_name": opponent_name
             })
         return jsonify({"status": "error", "message": "Игра уже началась"}), 400
         
-    game.join(user_id, user_name)
+    # Присоединяем второго игрока
+    if not game.join(user_id, user_name):
+        return jsonify({"status": "error", "message": "Не удалось присоединиться к игре"}), 400
+        
     game.player2_name = user_name
     save_game(game)
     
-    # Для второго игрока оппонент - это player1
     opponent_name = getattr(game, 'player1_name', 'Оппонент')
     
     return jsonify({
         "status": "ok",
-        "game_type": "chess" if "chess" in game.__module__ else ("checkers" if "checkers" in game.__module__ else "ugolki"),
+        "state": game.state.name,
+        "game_type": _detect_game_type(game),
         "board": _serialize_board(game),
+        "my_color": "BLACK",
         "opponent_name": opponent_name
     })
 

@@ -67,10 +67,16 @@ async function joinGame(gameId) {
             currentGameId = gameId;
             currentGameType = data.game_type;
             gameMode = 'PVP';
-            myColor = 'BLACK'; // Второй игрок
+            myColor = data.my_color || 'BLACK';
             
             boardState = data.board.grid;
             currentTurn = data.board.turn;
+            
+            if (data.state === 'WAITING') {
+                showInviteScreen(gameId);
+                startPolling();
+                return;
+            }
             
             document.getElementById('opponent-name').textContent = data.opponent_name || "Оппонент";
             document.getElementById('opponent-avatar').textContent = "👤";
