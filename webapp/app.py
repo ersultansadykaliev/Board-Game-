@@ -303,6 +303,53 @@ def ai_move():
         "reason": reason
     })
 
+@app.route("/api/surrender", methods=["POST"])
+def surrender_api():
+    data = request.json
+    user_id = data.get("user_id", "guest")
+    game_id = data.get("game_id")
+    
+    game = load_game(game_id)
+    if not game:
+        return jsonify({"status": "error", "message": "Игра не найдена"}), 404
+        
+    # PythonAnywhere uses python 3.10, so we can use duck typing
+    if hasattr(game, "surrender"):
+        # For simplicity, pass user_id (surrender expects int typically, but let's try to pass the raw string if needed, or convert)
+        try:
+            uid = int(user_id)
+        except:
+            uid = user_id
+        game.surrender(uid)
+        save_game(game)
+        
+    return jsonify({"status": "ok"})
+
+@app.route("/api/draw", methods=["POST"])
+def draw_api():
+    data = request.json
+    game_id = data.get("game_id")
+    
+    game = load_game(game_id)
+    if not game:
+        return jsonify({"status": "error", "message": "Игра не найдена"}), 404
+        
+    if "chess" in game.__module__:
+        from games.chess.game import GameState
+        game.state = GameState.FINISHED
+    elif "checkers" in game.__module__:
+        from games.checkers.game import GameState
+        game.state = GameState.FINISHED
+    elif "ugolki" in game.__module__:
+        from games.ugolki.game import GameState
+        game.state = GameState.FINISHED
+        
+    game.winner = 0
+    game.finish_reason = "Ничья по согласию"
+    save_game(game)
+    
+    return jsonify({"status": "ok"})
+
 def _serialize_board(game):
     board_state = []
     game_module = game.__module__

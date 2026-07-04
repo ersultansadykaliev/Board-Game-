@@ -397,3 +397,51 @@ async function makeAiMove() {
 function setStatus(text) {
     document.getElementById('status-message').textContent = text;
 }
+
+async function surrenderGame() {
+    if (!confirm("Вы уверены, что хотите сдаться?")) return;
+    
+    try {
+        const response = await fetch('/api/surrender', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ game_id: currentGameId, user_id: user_id })
+        });
+        const data = await response.json();
+        if (data.status === 'ok') {
+            setStatus("Вы сдались.");
+            // State poll will pick up the game_over flag automatically
+        }
+    } catch (e) {
+        alert("Ошибка сети");
+    }
+}
+
+async function offerDraw() {
+    if (!confirm("Предложить ничью (пока завершает игру мгновенно)?")) return;
+    
+    try {
+        const response = await fetch('/api/draw', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ game_id: currentGameId })
+        });
+        const data = await response.json();
+        if (data.status === 'ok') {
+            setStatus("Ничья.");
+        }
+    } catch (e) {
+        alert("Ошибка сети");
+    }
+}
+
+function exitToMenu() {
+    if (pollInterval) {
+        clearInterval(pollInterval);
+        pollInterval = null;
+    }
+    document.getElementById('game-area').style.display = 'none';
+    document.getElementById('game-menu').style.display = 'flex';
+    // Проверим активные игры снова, чтобы показать баннер
+    checkActiveGames();
+}

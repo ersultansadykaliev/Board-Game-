@@ -79,6 +79,12 @@
                         <span class="name" id="user-name">Игрок</span>
                     </div>
                 </footer>
+                
+                <div class="game-controls" style="display: flex; gap: 10px; margin-top: 15px; justify-content: center;">
+                    <button class="btn-friend" style="flex: 1; padding: 12px; font-size: 14px; background: rgba(255, 193, 7, 0.2); border: 1px solid #ffc107;" onclick="offerDraw()">🤝 Ничья</button>
+                    <button class="btn-friend" style="flex: 1; padding: 12px; font-size: 14px; background: rgba(255, 82, 82, 0.2); border: 1px solid #ff5252;" onclick="surrenderGame()">🏳️ Сдаться</button>
+                </div>
+                <button class="btn-ai" style="width: 100%; margin-top: 10px; margin-bottom: 20px; padding: 12px; font-size: 14px; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255,255,255,0.2);" onclick="exitToMenu()">🏠 Выйти в меню (не завершая)</button>
             </div>
         </main>
     </div>
