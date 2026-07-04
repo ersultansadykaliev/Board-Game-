@@ -33,4 +33,4 @@ run_tests.py
 .env
 
 # Database
-games.db
+*.db
