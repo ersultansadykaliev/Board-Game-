@@ -38,7 +38,7 @@ if (!startParam) {
 }
 
 if (startParam && startParam.startsWith('pvp_')) {
-    joinGame(startParam.substring(4)); // Отрезаем 'pvp_' чтобы получить чистый ID
+    joinGame(startParam); // startParam уже содержит полный game_id вида pvp_xxxxx
 }
 
 async function joinGame(gameId) {
@@ -49,7 +49,7 @@ async function joinGame(gameId) {
         const response = await fetch('/api/join_pvp', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ user_id: user_id, game_id: gameId })
+            body: JSON.stringify({ user_id: user_id, user_name: user_name, game_id: gameId })
         });
         const data = await response.json();
         if (data.status === 'ok') {
@@ -61,7 +61,7 @@ async function joinGame(gameId) {
             boardState = data.board.grid;
             currentTurn = data.board.turn;
             
-            document.getElementById('opponent-name').textContent = "Оппонент";
+            document.getElementById('opponent-name').textContent = data.opponent_name || "Оппонент";
             document.getElementById('opponent-avatar').textContent = "👤";
             document.getElementById('game-area').style.display = 'flex';
             
@@ -88,7 +88,7 @@ async function initGame(gameType = 'chess', mode = 'PVE') {
         const response = await fetch(endpoint, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ user_id: user_id, game_type: gameType })
+            body: JSON.stringify({ user_id: user_id, user_name: user_name, game_type: gameType })
         });
         const data = await response.json();
         if (data.status === 'ok') {
@@ -116,8 +116,8 @@ async function initGame(gameType = 'chess', mode = 'PVE') {
 
 function showInviteScreen(gameId) {
     document.getElementById('waiting-screen').style.display = 'block';
-    // Используем прямую ссылку на сайт, чтобы работало у всех без настройки t.me
-    const link = `https://Ersultan000.pythonanywhere.com/?start_param=pvp_${gameId}`;
+    // gameId уже имеет вид pvp_xxxxx, поэтому не добавляем pvp_ повторно
+    const link = `https://Ersultan000.pythonanywhere.com/?start_param=${gameId}`;
     document.getElementById('invite-link').innerText = link;
 }
 
@@ -149,6 +149,9 @@ async function fetchState() {
                 // Второй игрок подключился
                 document.getElementById('waiting-screen').style.display = 'none';
                 document.getElementById('game-area').style.display = 'flex';
+                if (data.opponent_name) {
+                    document.getElementById('opponent-name').textContent = data.opponent_name;
+                }
                 tg.HapticFeedback.notificationOccurred('success');
             }
             

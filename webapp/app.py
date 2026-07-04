@@ -44,18 +44,20 @@ def index():
 def start_game():
     data = request.json
     user_id = data.get("user_id", "guest")
+    user_name = data.get("user_name", "Игрок")
     game_type = data.get("game_type", "chess")
     
     if game_type == "chess":
-        game = ChessGame(f"game_{user_id}", user_id, "Player", ChessMode.PVE)
+        game = ChessGame(f"game_{user_id}", user_id, user_name, ChessMode.PVE)
     elif game_type == "checkers":
-        game = CheckersGame(f"game_{user_id}", user_id, "Player", CheckersMode.PVE)
+        game = CheckersGame(f"game_{user_id}", user_id, user_name, CheckersMode.PVE)
     elif game_type == "ugolki":
-        game = UgolkiGame(f"game_{user_id}", user_id, "Player", UgolkiMode.PVE)
+        game = UgolkiGame(f"game_{user_id}", user_id, user_name, UgolkiMode.PVE)
     else:
         return jsonify({"status": "error", "message": "Неизвестная игра"}), 400
         
     game.player1_id = user_id
+    game.player1_name = user_name
     save_game(game)
     
     return jsonify({
@@ -68,6 +70,7 @@ def start_game():
 def create_pvp():
     data = request.json
     user_id = data.get("user_id", "guest")
+    user_name = data.get("user_name", "Игрок")
     game_type = data.get("game_type", "chess")
     
     game_id = f"pvp_{uuid.uuid4().hex[:8]}"
@@ -82,6 +85,8 @@ def create_pvp():
         return jsonify({"status": "error", "message": "Неизвестная игра"}), 400
         
     game.player1_id = user_id
+    game.player1_name = user_name
+    game.player2_name = None
     save_game(game)
     
     return jsonify({
@@ -94,6 +99,7 @@ def create_pvp():
 def join_pvp():
     data = request.json
     user_id = data.get("user_id", "guest")
+    user_name = data.get("user_name", "Игрок")
     game_id = data.get("game_id")
     
     game = load_game(game_id)
@@ -109,13 +115,18 @@ def join_pvp():
             })
         return jsonify({"status": "error", "message": "Игра уже началась"}), 400
         
-    game.join(user_id, "Player 2")
+    game.join(user_id, user_name)
+    game.player2_name = user_name
     save_game(game)
+    
+    # Для второго игрока оппонент - это player1
+    opponent_name = getattr(game, 'player1_name', 'Оппонент')
     
     return jsonify({
         "status": "ok",
         "game_type": "chess" if "chess" in game.__module__ else ("checkers" if "checkers" in game.__module__ else "ugolki"),
-        "board": _serialize_board(game)
+        "board": _serialize_board(game),
+        "opponent_name": opponent_name
     })
 
 @app.route("/api/state", methods=["GET"])
@@ -132,12 +143,16 @@ def get_state():
     elif game_over:
         reason = f"Победитель: {'Белые' if game.winner == 1 else 'Черные'} ({reason})"
         
+    # Определяем имя оппонента для запрашивающего
+    opponent_name = getattr(game, 'player2_name', None) or getattr(game, 'player1_name', 'Оппонент')
+        
     return jsonify({
         "status": "ok",
         "state": game.state.name,
         "board": _serialize_board(game),
         "game_over": game_over,
-        "reason": reason
+        "reason": reason,
+        "opponent_name": opponent_name
     })
 
 @app.route("/api/click", methods=["POST"])
