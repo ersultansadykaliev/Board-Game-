@@ -336,6 +336,8 @@ function renderBoard() {
             const cellDiv = document.createElement('div');
             const isLight = (r + c) % 2 === 0;
             cellDiv.className = `cell ${isLight ? 'light' : 'dark'}`;
+            cellDiv.dataset.r = r;
+            cellDiv.dataset.c = c;
             
             if (selectedPiece && selectedPiece[0] === r && selectedPiece[1] === c) {
                 cellDiv.classList.add('selected');
