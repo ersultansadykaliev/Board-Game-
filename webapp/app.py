@@ -48,7 +48,8 @@ def _detect_game_type(game):
     return "unknown"
 
 @app.route("/")
-def index():
+@app.route("/game/<game_id>")
+def index(game_id=None):
     return render_template("index.html")
 
 @app.route("/api/my_games", methods=["GET"])

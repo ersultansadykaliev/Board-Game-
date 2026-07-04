@@ -37,6 +37,13 @@ if (!startParam) {
     const urlParams = new URLSearchParams(window.location.search);
     startParam = urlParams.get('start_param');
 }
+// Добавляем проверку пути на случай, если Telegram обрежет query-параметры
+if (!startParam) {
+    const match = window.location.pathname.match(/\/game\/(pvp_[a-zA-Z0-9]+)/);
+    if (match) {
+        startParam = match[1];
+    }
+}
 
 if (startParam && startParam.startsWith('pvp_')) {
     joinGame(startParam); // startParam уже содержит полный game_id вида pvp_xxxxx
@@ -132,6 +139,14 @@ async function resumeGame(gameId, gameType, mode, color) {
         const response = await fetch(`/api/state?game_id=${gameId}`);
         const data = await response.json();
         if (data.status === 'ok') {
+            if (data.state === 'WAITING') {
+                showInviteScreen(gameId);
+                if (mode === 'PVP') {
+                    startPolling();
+                }
+                return;
+            }
+            
             boardState = data.board.grid;
             currentTurn = data.board.turn;
             

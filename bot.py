@@ -176,7 +176,7 @@ async def cmd_start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         elif arg.startswith("pvp_"):
             # Мультиплеер через Mini App — отправляем кнопку для открытия игры
             game_id = arg  # полный ID вида pvp_xxxxx
-            join_url = f"https://Ersultan000.pythonanywhere.com/?start_param={game_id}"
+            join_url = f"https://Ersultan000.pythonanywhere.com/game/{game_id}"
             keyboard = InlineKeyboardMarkup([
                 [InlineKeyboardButton(
                     "🎮 Присоединиться к игре!",
