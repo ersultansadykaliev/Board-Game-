@@ -15,7 +15,7 @@ const PIECE_SYMBOLS = {
     'PAWN_WHITE': '♟\uFE0E', 'ROOK_WHITE': '♜\uFE0E', 'KNIGHT_WHITE': '♞\uFE0E', 'BISHOP_WHITE': '♝\uFE0E', 'QUEEN_WHITE': '♛\uFE0E', 'KING_WHITE': '♚\uFE0E',
     'PAWN_BLACK': '♟\uFE0E', 'ROOK_BLACK': '♜\uFE0E', 'KNIGHT_BLACK': '♞\uFE0E', 'BISHOP_BLACK': '♝\uFE0E', 'QUEEN_BLACK': '♛\uFE0E', 'KING_BLACK': '♚\uFE0E',
     'MAN_WHITE': '⚪', 'KING_WHITE_CHECKERS': '♔', 'MAN_BLACK': '⚫', 'KING_BLACK_CHECKERS': '♚',
-    'UGOLKI_MAN_WHITE': '▲', 'UGOLKI_MAN_BLACK': '▼'
+    'UGOLKI_MAN_WHITE': '⚪', 'UGOLKI_MAN_BLACK': '⚫'
 };
 
 let boardState = null;

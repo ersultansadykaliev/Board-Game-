@@ -90,6 +90,7 @@ class TestBotHandlers(unittest.IsolatedAsyncioTestCase):
         update.callback_query.data = "surrender"
         update.callback_query.from_user = self.user
         update.callback_query.answer = AsyncMock()
+        update.callback_query.inline_message_id = None
         
         await bot.callback_handler(update, self.context)
         

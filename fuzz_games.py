@@ -6,20 +6,30 @@ from games.checkers.game import Game as CheckersGame, GameMode as CheckersMode
 from games.chess.game import Game as ChessGame, ChessMode
 
 def fuzz_game(game_class, game_mode, num_actions=10000):
-    game = game_class(game_id="test", player1_id=1, player1_name="Player 1", mode=game_mode.PVP)
+    kwargs = {}
+    if game_class.__name__ == "Game" and "ugolki" in game_class.__module__:
+        variant = random.choice(["classic", "square", "triangle"])
+        kwargs["variant"] = variant
+        print(f"--- Fuzzing Ugolki with variant: {variant} ({num_actions} случайных действий) ---")
+    else:
+        print(f"--- Fuzzing {game_class.__name__} ({num_actions} случайных действий) ---")
+
+    game = game_class(game_id="test", player1_id=1, player1_name="Player 1", mode=game_mode.PVP, **kwargs)
     game.join(player2_id=2, player2_name="Player 2")
     
     actions = ["click", "surrender", "hints"]
     users = [1, 2, 3] # 3 - "левый" пользователь (зритель)
-    
-    print(f"--- Fuzzing {game_class.__name__} ({num_actions} случайных действий) ---")
     
     success_actions = 0
     
     for i in range(num_actions):
         if game.state.name == "FINISHED":
             # Перезапускаем игру, если кто-то выиграл или сдался
-            game = game_class(game_id="test", player1_id=1, player1_name="Player 1", mode=game_mode.PVP)
+            kwargs = {}
+            if game_class.__name__ == "Game" and "ugolki" in game_class.__module__:
+                variant = random.choice(["classic", "square", "triangle"])
+                kwargs["variant"] = variant
+            game = game_class(game_id="test", player1_id=1, player1_name="Player 1", mode=game_mode.PVP, **kwargs)
             game.join(player2_id=2, player2_name="Player 2")
             
         action = random.choices(actions, weights=[90, 5, 5])[0]
