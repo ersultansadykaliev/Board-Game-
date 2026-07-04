@@ -85,36 +85,42 @@ async function checkActiveGames() {
     try {
         const response = await fetch(`/api/my_games?user_id=${user_id}`);
         const data = await response.json();
+        
+        const section = document.getElementById('my-games-section');
+        
         if (data.status === 'ok' && data.games.length > 0) {
-            const game = data.games[0];
-            showResumeScreen(game);
+            section.style.display = 'block';
+            section.innerHTML = '<h2 class="game-title" style="justify-content: center; margin-bottom: 15px;">🎮 Мои активные игры</h2>';
+            
+            const gameNames = { chess: 'Шахматы', checkers: 'Шашки', ugolki: 'Уголки' };
+            
+            data.games.forEach(game => {
+                const gameName = gameNames[game.game_type] || game.game_type;
+                const modeText = game.mode === 'PVP' ? `против ${game.opponent}` : 'против Бота ИИ';
+                
+                const card = document.createElement('div');
+                card.className = 'game-card';
+                card.style.marginBottom = '10px';
+                card.innerHTML = `
+                    <p style="opacity: 0.9; margin: 0 0 10px 0; color: #fff; font-size: 16px; font-weight: bold;">${gameName}</p>
+                    <p style="opacity: 0.7; margin: 0 0 15px 0; color: #fff; font-size: 14px;">${modeText}</p>
+                    <div class="game-actions" style="gap: 10px;">
+                        <button class="btn-ai" style="flex: 1; padding: 10px; font-size: 14px;" onclick="resumeGame('${game.game_id}', '${game.game_type}', '${game.mode}', '${game.my_color}')">▶️ Продолжить</button>
+                        <button class="btn-friend" style="padding: 10px; font-size: 14px; background: rgba(255,82,82,0.2); border: 1px solid #ff5252;" onclick="dismissResume('${game.game_id}')">🗑</button>
+                    </div>
+                `;
+                section.appendChild(card);
+            });
+        } else {
+            section.style.display = 'none';
+            section.innerHTML = '';
         }
     } catch (e) {
         console.error('Ошибка проверки активных игр', e);
     }
 }
 
-function showResumeScreen(game) {
-    const gameNames = { chess: 'Шахматы', checkers: 'Шашки', ugolki: 'Уголки' };
-    const gameName = gameNames[game.game_type] || game.game_type;
-    const modeText = game.mode === 'PVP' ? `против ${game.opponent}` : 'против Бота ИИ';
-    
-    document.getElementById('resume-game-name').textContent = `${gameName} ${modeText}`;
-    document.getElementById('resume-screen').style.display = 'block';
-    document.getElementById('resume-screen').dataset.gameId = game.game_id;
-    document.getElementById('resume-screen').dataset.gameType = game.game_type;
-    document.getElementById('resume-screen').dataset.gameMode = game.mode;
-    document.getElementById('resume-screen').dataset.myColor = game.my_color;
-}
-
-async function resumeGame() {
-    const resumeEl = document.getElementById('resume-screen');
-    const gameId = resumeEl.dataset.gameId;
-    const gameType = resumeEl.dataset.gameType;
-    const mode = resumeEl.dataset.gameMode;
-    const color = resumeEl.dataset.myColor;
-    
-    resumeEl.style.display = 'none';
+async function resumeGame(gameId, gameType, mode, color) {
     document.getElementById('game-menu').style.display = 'none';
     
     currentGameId = gameId;
@@ -146,17 +152,15 @@ async function resumeGame() {
     }
 }
 
-async function dismissResume() {
-    const resumeEl = document.getElementById('resume-screen');
-    const gameId = resumeEl.dataset.gameId;
-    resumeEl.style.display = 'none';
-    
+async function dismissResume(gameId) {
+    if (!confirm("Вы уверены, что хотите удалить эту игру?")) return;
     try {
         await fetch('/api/delete_game', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ game_id: gameId })
         });
+        checkActiveGames(); // Перерисовываем список
     } catch (e) {
         console.error(e);
     }
