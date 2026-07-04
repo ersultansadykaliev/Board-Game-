@@ -86,6 +86,7 @@ main {
 
 #board-container {
     width: 100%;
+    max-width: 100%;
     aspect-ratio: 1;
     background: var(--board-bg);
     border-radius: 12px;
