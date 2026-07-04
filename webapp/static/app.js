@@ -38,7 +38,7 @@ if (!startParam) {
 }
 
 if (startParam && startParam.startsWith('pvp_')) {
-    joinGame(startParam);
+    joinGame(startParam.substring(4)); // Отрезаем 'pvp_' чтобы получить чистый ID
 }
 
 async function joinGame(gameId) {
@@ -126,6 +126,12 @@ function copyInviteLink() {
     navigator.clipboard.writeText(link).then(() => {
         tg.showAlert("Ссылка скопирована! Отправьте её другу в Telegram.");
     });
+}
+
+function shareInviteLink() {
+    const link = document.getElementById('invite-link').innerText;
+    const shareUrl = `https://t.me/share/url?url=${encodeURIComponent(link)}&text=${encodeURIComponent('Давай сыграем партию в настольные игры!')}`;
+    tg.openTelegramLink(shareUrl);
 }
 
 function startPolling() {
