@@ -6,7 +6,7 @@
     <title>Chess Mini App</title>
     <!-- Подключаем Telegram Web App JS -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="/static/style.css?v=3">
 </head>
 <body>
     <div id="app-container">
@@ -39,9 +39,17 @@
                 
                 <div class="game-card">
                     <h3 class="game-title"><span class="game-icon">⚫</span> Уголки</h3>
+                    <div style="margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                        <label for="ugolki-variant" style="font-size: 14px; opacity: 0.8; color: #fff;">Вариант:</label>
+                        <select id="ugolki-variant" style="flex: 1; padding: 8px 12px; border-radius: 8px; background: rgba(30, 41, 59, 0.9); border: 1px solid rgba(255,255,255,0.2); color: #fff; font-size: 14px; outline: none; cursor: pointer;">
+                            <option value="classic">Классика (3x4)</option>
+                            <option value="square">Квадрат (3x3)</option>
+                            <option value="triangle">Треугольник</option>
+                        </select>
+                    </div>
                     <div class="game-actions">
-                        <button class="btn-ai" onclick="initGame('ugolki', 'PVE')">🤖 С ботом</button>
-                        <button class="btn-friend" onclick="initGame('ugolki', 'PVP')">👤 С другом</button>
+                        <button class="btn-ai" onclick="initGame('ugolki', 'PVE', document.getElementById('ugolki-variant').value)">🤖 С ботом</button>
+                        <button class="btn-friend" onclick="initGame('ugolki', 'PVP', document.getElementById('ugolki-variant').value)">👤 С другом</button>
                     </div>
                 </div>
             </div>
@@ -84,6 +92,6 @@
             </div>
         </main>
     </div>
-    <script src="/static/app.js"></script>
+    <script src="/static/app.js?v=3"></script>
 </body>
 </html>

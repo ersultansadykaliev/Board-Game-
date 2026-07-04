@@ -108,7 +108,12 @@ async function checkActiveGames() {
             const gameNames = { chess: 'Шахматы', checkers: 'Шашки', ugolki: 'Уголки' };
             
             data.games.forEach(game => {
-                const gameName = gameNames[game.game_type] || game.game_type;
+                let gameName = gameNames[game.game_type] || game.game_type;
+                if (game.game_type === 'ugolki' && game.variant) {
+                    const variantNames = { classic: 'Классика (3x4)', square: 'Квадрат (3x3)', triangle: 'Треугольник' };
+                    const varName = variantNames[game.variant] || game.variant;
+                    gameName += ` (${varName})`;
+                }
                 const modeText = game.mode === 'PVP' ? `против ${game.opponent}` : 'против Бота ИИ';
                 
                 const card = document.createElement('div');
@@ -187,7 +192,7 @@ async function dismissResume(gameId) {
     }
 }
 
-async function initGame(gameType = 'chess', mode = 'PVE') {
+async function initGame(gameType = 'chess', mode = 'PVE', variant = 'classic') {
     currentGameType = gameType;
     gameMode = mode;
     myColor = 'WHITE';
@@ -198,7 +203,7 @@ async function initGame(gameType = 'chess', mode = 'PVE') {
         const response = await fetch(endpoint, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ user_id: user_id, user_name: user_name, game_type: gameType })
+            body: JSON.stringify({ user_id: user_id, user_name: user_name, game_type: gameType, variant: variant })
         });
         const data = await response.json();
         if (data.status === 'ok') {

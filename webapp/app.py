@@ -96,6 +96,7 @@ def my_games():
                             "state": game.state.name,
                             "opponent": opponent,
                             "my_color": my_color,
+                            "variant": getattr(game, 'variant', 'classic'),
                             "board": _serialize_board(game)
                         })
             except Exception:
@@ -119,13 +120,14 @@ def start_game():
     user_id = data.get("user_id", "guest")
     user_name = data.get("user_name", "Игрок")
     game_type = data.get("game_type", "chess")
+    variant = data.get("variant", "classic")
     
     if game_type == "chess":
         game = ChessGame(f"game_{user_id}", user_id, user_name, ChessMode.PVE)
     elif game_type == "checkers":
         game = CheckersGame(f"game_{user_id}", user_id, user_name, CheckersMode.PVE)
     elif game_type == "ugolki":
-        game = UgolkiGame(f"game_{user_id}", user_id, user_name, UgolkiMode.PVE)
+        game = UgolkiGame(f"game_{user_id}", user_id, user_name, UgolkiMode.PVE, variant=variant)
     else:
         return jsonify({"status": "error", "message": "Неизвестная игра"}), 400
         
@@ -145,6 +147,7 @@ def create_pvp():
     user_id = data.get("user_id", "guest")
     user_name = data.get("user_name", "Игрок")
     game_type = data.get("game_type", "chess")
+    variant = data.get("variant", "classic")
     
     game_id = f"pvp_{uuid.uuid4().hex[:8]}"
     
@@ -153,7 +156,7 @@ def create_pvp():
     elif game_type == "checkers":
         game = CheckersGame(game_id, user_id, "Player 1", CheckersMode.PVP)
     elif game_type == "ugolki":
-        game = UgolkiGame(game_id, user_id, "Player 1", UgolkiMode.PVP)
+        game = UgolkiGame(game_id, user_id, "Player 1", UgolkiMode.PVP, variant=variant)
     else:
         return jsonify({"status": "error", "message": "Неизвестная игра"}), 400
         
@@ -191,6 +194,7 @@ def join_pvp():
             "status": "ok",
             "state": game.state.name,
             "game_type": _detect_game_type(game),
+            "variant": getattr(game, 'variant', 'classic'),
             "board": _serialize_board(game),
             "my_color": "WHITE",
             "opponent_name": opponent_name
@@ -203,6 +207,7 @@ def join_pvp():
                 "status": "ok",
                 "state": game.state.name,
                 "game_type": _detect_game_type(game),
+                "variant": getattr(game, 'variant', 'classic'),
                 "board": _serialize_board(game),
                 "my_color": "BLACK",
                 "opponent_name": opponent_name
@@ -222,6 +227,7 @@ def join_pvp():
         "status": "ok",
         "state": game.state.name,
         "game_type": _detect_game_type(game),
+        "variant": getattr(game, 'variant', 'classic'),
         "board": _serialize_board(game),
         "my_color": "BLACK",
         "opponent_name": opponent_name
